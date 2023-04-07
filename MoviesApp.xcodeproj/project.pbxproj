@@ -138,12 +138,12 @@
 				0F7FA2A329D97EB500A6BDE7 /* ViewController.swift */,
 				0F2158A529DD4FCC00E10616 /* DetailViewController.swift */,
 				0F98A8E329DE9B4A00A75BED /* SearchViewController.swift */,
+				025AB14A29E052C500873F3A /* Constants.swift */,
 				0F7FA2A529D97EB500A6BDE7 /* Main.storyboard */,
 				0F7FA2A829D97EB700A6BDE7 /* Assets.xcassets */,
 				0F7FA2AA29D97EB700A6BDE7 /* LaunchScreen.storyboard */,
 				0F7FA2AD29D97EB700A6BDE7 /* Info.plist */,
 				0F128A1329DFFA4100EBAE2B /* Color.xcassets */,
-				025AB14A29E052C500873F3A /* Constants.swift */,
 			);
 			path = MoviesApp;
 			sourceTree = "<group>";
