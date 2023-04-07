@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		025AB14929E052A200873F3A /* ServiceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 025AB14829E052A200873F3A /* ServiceManager.swift */; };
+		025AB14B29E052C500873F3A /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 025AB14A29E052C500873F3A /* Constants.swift */; };
 		0F128A1429DFFA4100EBAE2B /* Color.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0F128A1329DFFA4100EBAE2B /* Color.xcassets */; };
 		0F1E729729DC4A61008D1566 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 0F1E729629DC4A61008D1566 /* Kingfisher */; };
 		0F2158A629DD4FCC00E10616 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F2158A529DD4FCC00E10616 /* DetailViewController.swift */; };
@@ -49,6 +51,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		025AB14829E052A200873F3A /* ServiceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceManager.swift; sourceTree = "<group>"; };
+		025AB14A29E052C500873F3A /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		0F128A1329DFFA4100EBAE2B /* Color.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Color.xcassets; sourceTree = "<group>"; };
 		0F2158A529DD4FCC00E10616 /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
 		0F2158A929DD73EC00E10616 /* MovieDetailModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieDetailModel.swift; sourceTree = "<group>"; };
@@ -139,6 +143,7 @@
 				0F7FA2AA29D97EB700A6BDE7 /* LaunchScreen.storyboard */,
 				0F7FA2AD29D97EB700A6BDE7 /* Info.plist */,
 				0F128A1329DFFA4100EBAE2B /* Color.xcassets */,
+				025AB14A29E052C500873F3A /* Constants.swift */,
 			);
 			path = MoviesApp;
 			sourceTree = "<group>";
@@ -192,6 +197,7 @@
 			isa = PBXGroup;
 			children = (
 				0FDD450829DAAE4800384337 /* ApiClient.swift */,
+				025AB14829E052A200873F3A /* ServiceManager.swift */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -341,6 +347,8 @@
 				0FDD450B29DAAF9200384337 /* PopularMoviesModel.swift in Sources */,
 				0F2158AA29DD73EC00E10616 /* MovieDetailModel.swift in Sources */,
 				0F98A8EA29DED92800A75BED /* UIColor+Hexcode.swift in Sources */,
+				025AB14B29E052C500873F3A /* Constants.swift in Sources */,
+				025AB14929E052A200873F3A /* ServiceManager.swift in Sources */,
 				0F7FA2A429D97EB500A6BDE7 /* ViewController.swift in Sources */,
 				0F7FA2D429D98C2000A6BDE7 /* CategoriesCell.swift in Sources */,
 				0F7FA2A029D97EB500A6BDE7 /* AppDelegate.swift in Sources */,

@@ -13,101 +13,57 @@ class ApiClient{
     
     static let apiClient = ApiClient()
     
-    init() {
-        print("apiclient calıstıııı")
-    }
-    
-    
+    init() {}
     
     func fetchPopularMovies(succesData: @escaping (PopularMoviesModel) -> Void)  {
+        let queryList: [QueryList] = [QueryList(queryKey: "api_key", queryValue: Constants.apiKey),
+        QueryList(queryKey: "language", queryValue: "en-US"),
+        QueryList(queryKey: "page", queryValue: "1")]
+        let baseUrl = createEndpoint(resourceKey: "movie/popular", list: queryList)
         
-     
-        let baseUrl = "https://api.themoviedb.org/3/movie/popular?api_key=eb2dfe5fb23e1bdcd3dbf005750c38be&language=en-US&page=1"
-        print(baseUrl)
-        
-        
-        AF.request(baseUrl, method:.get, encoding:JSONEncoding.default, headers: nil, interceptor: nil).response{
-            (responseData) in
-            
-            guard let data = responseData.data else { return }
-            
-            
-            do{
-              
-                let data = try JSONDecoder().decode(PopularMoviesModel.self, from: data)
-               
-                succesData(data)
-              
-                
-            } catch {
-                print(data)
-                print("catch bloğu")
-            }
-            
-            
-            
+        ServiceManager.shared.fetch(path: baseUrl) { (response: PopularMoviesModel) in
+            succesData(response)
         }
     }
     
     
     func fetchMovieDetail(params:Int, succesData: @escaping (Welcome) -> Void)  {
+        let queryList: [QueryList] = [QueryList(queryKey: "api_key", queryValue: Constants.apiKey),
+        QueryList(queryKey: "language", queryValue: "en-US")]
+        let baseUrl = createEndpoint(resourceKey: String(format: "%@%@", "movie/", String(params)), list: queryList)
         
-       
-        let baseUrl = String(format: "%@%@%@","https://api.themoviedb.org/3/movie/", String(params),"?api_key=eb2dfe5fb23e1bdcd3dbf005750c38be&language=en-US")
-        //string birleştirme
-        AF.request(baseUrl, method:.get, encoding:JSONEncoding.default, headers: nil, interceptor: nil).response{
-            (responseData) in
-        
-            guard let data = responseData.data else { return }
-            
-            
-            do{
-                print(baseUrl)
-                let data = try JSONDecoder().decode(Welcome.self, from: data)
-                succesData(data)
-                debugPrint(data)
-                
-            } catch {
-            
-                print("catch bloğu")
-            }
-            
-            
-            
+        ServiceManager.shared.fetch(path: baseUrl) { (response: Welcome) in
+            succesData(response)
         }
     }
     
     
     func fetchSeacrhMovies(search:String, succesData: @escaping (PopularMoviesModel) -> Void)  {
-        
-        print("fetchhhhhh search")
-        print(search)
-     
-   
-        let baseUrl = String(format: "%@%@%@","https://api.themoviedb.org/3/search/movie?api_key=eb2dfe5fb23e1bdcd3dbf005750c38be&language=en-US&query=", search,"&page=1&include_adult=false")
-        //string birleştirme
-        AF.request(baseUrl, method:.get, encoding:JSONEncoding.default, headers: nil, interceptor: nil).response{
-            (responseData) in
-        
-            guard let data = responseData.data else { return }
-            
-            
-            do{
-                print(baseUrl)
-                let data = try JSONDecoder().decode(PopularMoviesModel.self, from: data)
-                succesData(data)
-                debugPrint(data)
-                
-            } catch {
-                print(data)
-                print("catch bloğu")
-            }
-            
-            
-            
+        let queryList: [QueryList] =
+            [QueryList(queryKey: "api_key", queryValue: Constants.apiKey),
+            QueryList(queryKey: "language", queryValue: "en-US"),
+            QueryList(queryKey: "query", queryValue: search),
+            QueryList(queryKey: "page", queryValue: "1"),
+            QueryList(queryKey: "include_adult", queryValue: "false")]
+        let baseUrl = createEndpoint(resourceKey: "search/movie", list: queryList)
+        ServiceManager.shared.fetch(path: baseUrl) { (response: PopularMoviesModel) in
+            succesData(response)
         }
     }
     
-    
-    
+    private func createEndpoint(resourceKey: String, list: [QueryList]) -> URL {
+        var queryItems: [URLQueryItem] = []
+        for item in list {
+            queryItems.append(URLQueryItem(name: item.queryKey, value: item.queryValue))
+        }
+        let baseURL = String(format: "%@%@", Constants.baseURL, resourceKey)
+        var urlComps = URLComponents(string: baseURL)!
+        urlComps.queryItems = queryItems
+        return urlComps.url!
+    }
+}
+
+struct QueryList {
+    var queryKey: String
+    var queryValue: String
 }
