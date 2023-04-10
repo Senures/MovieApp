@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  HomeViewController.swift
 //  MoviesApp
 //
 //  Created by SEMANUR ESERLER on 2.04.2023.
@@ -8,12 +8,25 @@
 import UIKit
 import Kingfisher
 
-final class ViewController: UIViewController {
+
+protocol HomeViewControllerProtocol : AnyObject {
+ //protocolleri weaki sadece classlara uygulanması gerekiyo,structlara değil.
+    func setupUI()
+    func collectionViewSet()
+    func reloadCollectionView()
+}
+
+
+final class HomeViewController: UIViewController, HomeViewControllerProtocol {
+    
+    private lazy var  viewModel = HomeViewModel()
+    
     
     
     let categoriList = ["Populars", "Coming Soon", "Top Rating", "Comedy", "Action","Fantastic","Drama","Anime"]
     
-    var results : [Result]?
+
+    
     @IBOutlet weak var popularCView: UICollectionView!
     @IBOutlet weak var categoriesCView: UICollectionView!
     
@@ -24,15 +37,15 @@ final class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setUiColor()
-        apiCall()
-        collectionViewSet()
-        
+        viewModel.view = self
+        //view modelın delegate
+        viewModel.viewDidLoad()
+       
     
     }
     
     //MARK : Uygulamadaki view ve collectionvieların arka plan rengi verildi
-    func  setUiColor(){
+    func  setupUI(){
         view.backgroundColor = .black
       //  titleView.backgroundColor = hexStringToUIColor(hex: "#1E1D1D")
         titleView.backgroundColor = UIColor(named: "lightGray")
@@ -41,15 +54,7 @@ final class ViewController: UIViewController {
         popularCView.backgroundColor = .black
     }
     
-    //MARK : apiyi cagırdıgım fonksiyon
-    func  apiCall(){
-        ApiClient.apiClient.fetchPopularMovies { response in
-         self.results = response.results
-            print("ssssssss \(String(describing: self.results?[0].originalTitle))")
-            self.popularCView.reloadData()
-            self.categoriesCView.reloadData()
-        }
-    }
+    
     
     //MARK : delegate bağlama işlemleri
     func  collectionViewSet(){
@@ -65,6 +70,14 @@ final class ViewController: UIViewController {
         UICollectionViewFlowLayout()
     }
     
+    func reloadCollectionView() {
+        
+        DispatchQueue.main.async {
+            self.popularCView.reloadData()
+        }
+        //reload ile ui yenileniyor güncel tutuyor o yüzden main threadde olmasını sağlıyor
+    }
+    
     
     
     @IBAction func searchButton(_ sender: Any) {
@@ -77,13 +90,13 @@ final class ViewController: UIViewController {
 
 
 
-extension ViewController: UICollectionViewDataSource {
+extension HomeViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if collectionView == categoriesCView {
             return categoriList.count
             // collectionView1 için veri sayısını döndürün
         } else if collectionView == popularCView {
-            return results?.count ?? 8
+            return self.viewModel.results?.count ?? 8
             // collectionView2 için veri sayısını döndürün
         }
         return 0
@@ -100,15 +113,15 @@ extension ViewController: UICollectionViewDataSource {
         } else if collectionView == popularCView {
             
             let cell = popularCView.dequeueReusableCell(withReuseIdentifier:"popularcell", for: indexPath) as! PopularMoviesCell
-            cell.popularMovieName.text = results?[indexPath.row].title
-            var img = results?[indexPath.row].backdropPath
+            cell.popularMovieName.text = self.viewModel.results?[indexPath.row].title
+            var img = self.viewModel.results?[indexPath.row].backdropPath
             
             let url = URL(string: "https://image.tmdb.org/t/p/w500" + (img ?? ""))
            
             cell.popularImg.kf.setImage(with: url)
             cell.backgroundColor = hexStringToUIColor(hex: "#1E1D1D")
             cell.layer.cornerRadius = 10
-            let date = results?[indexPath.row].releaseDate
+            let date = self.viewModel.results?[indexPath.row].releaseDate
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "yyyy-MM-dd"
             if let parsedDate = dateFormatter.date(from: date ?? "") {
@@ -116,7 +129,7 @@ extension ViewController: UICollectionViewDataSource {
                 cell.movDate.text = "(\(String(year)))"
                 
             }
-            let stringNumber = String(results?[indexPath.row].voteAverage ?? 7.2)
+            let stringNumber = String(self.viewModel.results?[indexPath.row].voteAverage ?? 7.2)
             cell.vote.text = stringNumber
             
           
@@ -126,13 +139,12 @@ extension ViewController: UICollectionViewDataSource {
         return UICollectionViewCell()
     }
     
-    
-    
+   
     //TIKLANDIGINDA VERİYİ GÖNDERİCEM MODELİ GÖNDERCEM
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if collectionView == popularCView {
            
-            if let data = results?[indexPath.row].id {
+            if let data = self.viewModel.results?[indexPath.row].id {
                 self.performSegue(withIdentifier:"goDetail", sender: data)
             }
         }
@@ -162,7 +174,7 @@ extension ViewController: UICollectionViewDataSource {
 
 
 
-extension ViewController: UICollectionViewDelegateFlowLayout {
+extension HomeViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         if collectionView == categoriesCView {
             return CGSize(width: 150, height: 50)

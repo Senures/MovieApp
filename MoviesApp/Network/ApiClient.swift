@@ -13,7 +13,7 @@ class ApiClient{
     
     static let apiClient = ApiClient()
     
-    init() {
+   private init() {
         print("apiclient calıstıııı")
     }
     

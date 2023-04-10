@@ -6,23 +6,20 @@
 //
 
 import UIKit
+protocol SearchViewControllerProtocol : AnyObject {
+ //protocolleri weaki sadece classlara uygulanması gerekiyo,structlara değil.
+    func setupUI()
+    func collectionViewSet()
+    func reloadCollectionView()
+}
 
-final class SearchViewController: UIViewController, UITextFieldDelegate {
+
+final class SearchViewController: UIViewController, UITextFieldDelegate, SearchViewControllerProtocol {
     
-    @IBOutlet weak var searchTextfield: UITextField!
-    @IBOutlet weak var searchCview: UICollectionView!
-    @IBOutlet weak var appBarTitle: UILabel!
     
     var search : String = "avatar"
-    var searchList : [Result]?
     
-    @IBAction func backButton(_ sender: Any) {
-        dismiss(animated: true, completion: nil)
-    }
-    
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    func setupUI() {
         
         searchTextfield.beginFloatingCursor(at: CGPoint(x: 20.0, y: 10.0))
         searchTextfield.endFloatingCursor()
@@ -33,13 +30,50 @@ final class SearchViewController: UIViewController, UITextFieldDelegate {
             string: "  find movie",
             attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray]
         )
-        searchCview.dataSource = self
-        searchCview.delegate = self
-        searchTextfield.delegate = self
+       
         
         searchTextfield.resignFirstResponder()
         searchCview.collectionViewLayout =
         UICollectionViewFlowLayout()
+    }
+    
+    func collectionViewSet() {
+        searchCview.dataSource = self
+        searchCview.delegate = self
+        searchTextfield.delegate = self
+    }
+    
+    func reloadCollectionView() {
+        
+        DispatchQueue.main.async {
+            self.searchCview.reloadData()
+        }
+        //reload ile ui yenileniyor güncel tutuyor o yüzden main threadde olmasını sağlıyor
+    }
+    
+    
+    let viewModel = SearchViewModel()
+    
+    
+    @IBOutlet weak var searchTextfield: UITextField!
+    @IBOutlet weak var searchCview: UICollectionView!
+    @IBOutlet weak var appBarTitle: UILabel!
+    
+    
+  
+    
+    @IBAction func backButton(_ sender: Any) {
+        dismiss(animated: true, completion: nil)
+    }
+    
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        viewModel.view = self
+        //view modelın delegate
+        viewModel.viewDidLoad()
+       
         // Do any additional setup after loading the view.
     }
     
@@ -48,34 +82,35 @@ final class SearchViewController: UIViewController, UITextFieldDelegate {
     
     
     
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        print("----------0")
-        textField.resignFirstResponder()
-        search(text: textField.text)
-        print("----------1")
-        return true
-    }
     
-    func search(text: String?) {
-        print("----------2")
-        if let deneme = text {
-            
-            self.search = deneme
-            print(self.search)
-            let searchText = self.search
-            
-            ApiClient.apiClient.fetchSeacrhMovies(search: search ?? "a"){ response in
-                
-                self.searchList = response.results
-                
-                self.searchCview.reloadData()
-                
-            }
-            
-        }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+           print("----------0")
+           textField.resignFirstResponder()
+           search(text: textField.text)
+           print("----------1")
+           return true
+       }
+       
+       func search(text: String?) {
+           print("----------2")
+           if let deneme = text {
+               
+               self.search = deneme
+               print(self.search)
+               let searchText = self.search
+               
+               viewModel.apiCall(search: search)
+               
         
-        
-    }
+               
+           }
+           
+           
+       }
+    
+    
+   
     
     
 }
@@ -84,21 +119,21 @@ final class SearchViewController: UIViewController, UITextFieldDelegate {
 
 extension SearchViewController :UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        searchList?.count ?? 0
+        self.viewModel.searchList?.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = searchCview.dequeueReusableCell(withReuseIdentifier:"searchCell", for: indexPath) as! SearchCell
-        cell.searchName.text = searchList?[indexPath.row].title
+        cell.searchName.text = self.viewModel.searchList?[indexPath.row].title
         cell.backgroundColor = hexStringToUIColor(hex: "#1E1D1D")
         cell.layer.cornerRadius = 10
        
-        var img = searchList?[indexPath.row].backdropPath
+        var img = self.viewModel.searchList?[indexPath.row].backdropPath
         
         let url = URL(string: "https://image.tmdb.org/t/p/w500" + (img ?? ""))
          
          cell.movImg.kf.setImage(with: url)
-        let date = searchList?[indexPath.row].releaseDate
+        let date = self.viewModel.searchList?[indexPath.row].releaseDate
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
         if let parsedDate = dateFormatter.date(from: date ?? "") {
@@ -106,7 +141,7 @@ extension SearchViewController :UICollectionViewDataSource, UICollectionViewDele
             cell.movYear.text = "(\(String(year)))"
             
         }
-        let stringNumber = searchList?[indexPath.row].voteAverage ?? 7.2
+        let stringNumber = self.viewModel.searchList?[indexPath.row].voteAverage ?? 7.2
         let vote = String(format: "%.1f", stringNumber)
         cell.movVote.text = String(stringNumber)
         return cell
@@ -117,7 +152,7 @@ extension SearchViewController :UICollectionViewDataSource, UICollectionViewDele
         
         
         
-        if let data = searchList?[indexPath.row].id {
+        if let data = self.viewModel.searchList?[indexPath.row].id {
             print(data)
             self.performSegue(withIdentifier:"goDetail", sender: data)
         }
