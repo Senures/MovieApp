@@ -3,6 +3,7 @@
 -  Alamofire
 -  Kingfisher
 -  TMDB Api
+- MVVM Architecture
 
 
 <img width="250" src="https://github.com/Senures/MovieApp/blob/main/img/1.png"> <img width="250" src="https://github.com/Senures/MovieApp/blob/main/img/2.png">
